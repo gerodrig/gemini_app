@@ -13,18 +13,23 @@ import 'package:gemini_app/config/gemini/gemini_implementation.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart';
 import 'package:uuid/uuid.dart';
 
-part 'basic_chat.g.dart';
+part 'chat_with_context.g.dart';
 
 final uuid = Uuid();
 
-@riverpod
-class BasicChat extends _$BasicChat {
+@Riverpod(keepAlive: true)
+class ChatWithContext extends _$ChatWithContext {
   final gemini = GeminiImplementation();
+
   late User geminiUser;
+  // late User chatUser;
+  late String chatId;
 
   @override
   List<Message> build() {
     geminiUser = ref.read(geminiUserProvider);
+    // chatUser = ref.read(userProvider);
+    chatId = uuid.v4();
     return [];
   }
 
@@ -37,7 +42,6 @@ class BasicChat extends _$BasicChat {
     if (images.isNotEmpty) {
       _addTextMessageWithImages(partialText, user, images);
     }
-    //if ... else switch
 
     _addTextMessage(partialText, user);
   }
@@ -63,7 +67,6 @@ class BasicChat extends _$BasicChat {
 
     _createTextMessage(partialText.text, author);
 
-    // _geminiTextResponse(partialText.text);
     _geminiTextResponseStream(partialText.text, images: images);
   }
 
@@ -83,7 +86,7 @@ class BasicChat extends _$BasicChat {
   }) async {
     _createTextMessage('Thinking...', geminiUser);
 
-    gemini.getResponseStream(prompt, files: images).listen((responseChunk) {
+    gemini.getChatStream(prompt, chatId, files: images).listen((responseChunk) {
       if (responseChunk.isEmpty) return;
 
       final updatedMessages = [...state];
@@ -98,6 +101,15 @@ class BasicChat extends _$BasicChat {
   }
 
   //? Helper methods
+  //*Clear Chat
+  void newChat() {
+    chatId = uuid.v4();
+    state = [];
+  }
+
+  // TODO: implement a way to load previous messages
+  // void loadPreviousMessages(String chatId) {}
+
   void _createTextMessage(String text, User author) {
     final message = TextMessage(
       id: uuid.v4(),
