@@ -1,4 +1,5 @@
 import 'package:gemini_app/presentation/screens/chat_context/chat_context_screen.dart';
+import 'package:gemini_app/presentation/screens/image/image_playground_screen.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:gemini_app/presentation/screens/basic_prompt/basic_prompt_screen.dart';
@@ -14,6 +15,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/history-chat',
       builder: (context, state) => const ChatContextScreen(),
+    ),
+    GoRoute(
+      path: '/image-playground',
+      builder: (context, state) => const ImagePlaygroundScreen(),
     ),
   ],
 );
